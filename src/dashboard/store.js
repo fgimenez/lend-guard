@@ -4,10 +4,11 @@ export class DashboardStore {
     const replacer = (_, v) => typeof v === 'bigint' ? v.toString() : v
     const safe = JSON.stringify(run, replacer)
     const entry = JSON.stringify({ ...run, timestamp: new Date().toISOString() }, replacer)
-    await Promise.all([
+    const [setResult, pushResult] = await Promise.all([
       this._kv.set('last_run', safe),
-      this._kv.lpush('audit_log', entry).then(() => this._kv.ltrim('audit_log', 0, 19))
+      this._kv.lpush('audit_log', entry).then(n => { this._kv.ltrim('audit_log', 0, 19); return n })
     ])
+    console.log('[store] kv.set result:', setResult, 'kv.lpush result:', pushResult)
   }
   async getStatus () {
     const [raw, entries] = await Promise.all([
