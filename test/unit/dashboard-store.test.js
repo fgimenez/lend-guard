@@ -26,26 +26,26 @@ describe('DashboardStore', () => {
     expect(typeof store.getStatus).toBe('function')
   })
 
-  it('saveRun stores snapshots and decision in kv', async () => {
+  it('saveRun stores snapshots and decision in kv as plain object', async () => {
     const kv = makeKv()
     const store = new DashboardStore(kv)
     await store.saveRun(makeRun())
-    expect(kv.set).toHaveBeenCalledWith('last_run', expect.any(String))
+    expect(kv.set).toHaveBeenCalledWith('last_run', expect.any(Object))
   })
 
   it('saveRun appends entry to audit list and trims to 20', async () => {
     const kv = makeKv()
     const store = new DashboardStore(kv)
     await store.saveRun(makeRun())
-    expect(kv.lpush).toHaveBeenCalledWith('audit_log', expect.any(String))
+    expect(kv.lpush).toHaveBeenCalledWith('audit_log', expect.any(Object))
     expect(kv.ltrim).toHaveBeenCalledWith('audit_log', 0, 19)
   })
 
-  it('getStatus returns parsed last_run and audit_log entries', async () => {
-    const run = makeRun()
+  it('getStatus returns last_run and audit_log entries as-is from kv', async () => {
+    const run = { snapshots: [{ chain: 'arbitrum' }], decision: {}, execResult: {} }
     const kv = makeKv()
-    kv.get.mockResolvedValue(JSON.stringify(run, (_, v) => typeof v === 'bigint' ? v.toString() : v))
-    kv.lrange.mockResolvedValue([JSON.stringify({ action: 'supply' })])
+    kv.get.mockResolvedValue(run)
+    kv.lrange.mockResolvedValue([{ action: 'supply' }])
     const store = new DashboardStore(kv)
     const status = await store.getStatus()
     expect(kv.get).toHaveBeenCalledWith('last_run')
