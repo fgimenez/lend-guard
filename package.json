@@ -5,7 +5,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node src/index.js",
+    "dev": "next dev",
+    "build": "next build",
     "test": "vitest run test/unit",
     "test:integration": "vitest run test/integration",
     "test:e2e": "vitest run test/e2e",
@@ -17,7 +19,11 @@
     "@anthropic-ai/sdk": "^0.39.0",
     "@tetherto/wdk-protocol-lending-aave-evm": "^1.0.0-beta.3",
     "@tetherto/wdk-wallet-evm": "^1.0.0-beta.2",
-    "express": "^4.18.2"
+    "@vercel/kv": "^3.0.0",
+    "express": "^4.18.2",
+    "next": "^14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "vitest": "^3.0.0"
