@@ -1,6 +1,8 @@
 import { createClient } from '@vercel/kv'
 import { NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET () {
   const url = process.env.KV_REST_API_URL
   const token = process.env.KV_REST_API_TOKEN
