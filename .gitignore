@@ -7,3 +7,5 @@ config.json
 audit.jsonl
 coverage/
 *.local.json
+.vercel
+.env*.local
