@@ -60,4 +60,8 @@ describe('strategy module', () => {
   it('validateStrategy throws when an unknown chain name is provided', () => {
     expect(() => validateStrategy(parseStrategy({ chains: ['not-a-chain'] }))).toThrow('unknown chain')
   })
+
+  it('validateStrategy accepts baseSepolia as a valid chain', () => {
+    expect(() => validateStrategy(parseStrategy({ chains: ['baseSepolia'] }))).not.toThrow()
+  })
 })
