@@ -11,11 +11,12 @@ export async function GET () {
     await kv.set('debug_test', 'hello')
     const val = await kv.get('debug_test')
     const lastRun = await kv.get('last_run')
+    const lastRunStr = lastRun ? JSON.stringify(lastRun).slice(0, 120) : null
     return NextResponse.json({
       urlPrefix: url ? url.slice(0, 30) + '...' : null,
       hasToken: !!token,
       writeReadTest: val,
-      lastRunPresent: lastRun !== null
+      lastRunSnippet: lastRunStr
     })
   } catch (err) {
     return NextResponse.json({ error: err.message, stack: err.stack?.slice(0, 300) }, { status: 500 })
