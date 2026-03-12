@@ -11,8 +11,8 @@ const HEALTH_COLOR = (hf) => {
 const ACTION_COLOR = { supply: '#00e5cc', repay: '#f97316', withdraw: '#a78bfa', hold: '#64748b' }
 
 const fmt = (v) => v === 'Infinity' ? '∞' : typeof v === 'number' ? v.toFixed(2) : v ?? '—'
-const fmtAPY = (v) => v ? (v * 100).toFixed(2) + '%' : '—'
-const fmtUSDT = (v) => v ? '$' + (Number(v) / 1e6).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '—'
+const fmtAPY = (v) => v ? v.toFixed(2) + '%' : '—'
+const fmtUSDT = (v) => v != null ? '$' + Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '—'
 const fmtTime = (ts) => ts ? new Date(ts).toLocaleTimeString() : '—'
 
 export default function Dashboard () {
@@ -82,7 +82,7 @@ export default function Dashboard () {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 12, color: '#94a3b8' }}>Wallet USDT</span>
-                  <span>{fmtUSDT(s.walletUSDTBalance)}</span>
+                  <span>{fmtUSDT(s.walletUSDT)}</span>
                 </div>
               </div>
             ))}
@@ -104,7 +104,7 @@ export default function Dashboard () {
               }}>{decision.action}</span>
               {decision.chain && <span style={{ color: '#94a3b8', fontSize: 13 }}>on <b style={{ color: '#e2e8f0' }}>{decision.chain}</b></span>}
               {decision.amountRaw && Number(decision.amountRaw) > 0 &&
-                <span style={{ color: '#94a3b8', fontSize: 13 }}>{fmtUSDT(decision.amountRaw)}</span>}
+                <span style={{ color: '#94a3b8', fontSize: 13 }}>${(Number(decision.amountRaw) / 1e6).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>}
               <span style={{ marginLeft: 'auto', fontSize: 12, color: '#64748b' }}>
                 confidence {((decision.confidence ?? 0) * 100).toFixed(0)}% · {decision.urgency}
               </span>
