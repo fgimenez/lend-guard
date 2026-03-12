@@ -19,7 +19,7 @@ export function buildSnapshot (chain, rawAccountData, walletUSDTBalance, supplyR
     healthFactor: normalizeHealthFactor(rawAccountData.healthFactor),
     totalCollateralUSD: Number(rawAccountData.totalCollateralBase) / 1e8,
     totalDebtUSD: Number(rawAccountData.totalDebtBase) / 1e8,
-    walletUSDTBalance,
+    walletUSDT: Number(walletUSDTBalance) / 1e6,
     supplyAPY: normalizeAPY(supplyRayRate),
     timestamp: new Date()
   }

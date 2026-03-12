@@ -61,9 +61,9 @@ describe('monitor module', () => {
     expect(buildSnapshot('base', raw, 0n, 0n).totalDebtUSD).toBeCloseTo(500)
   })
 
-  it('buildSnapshot passes walletUSDTBalance through as a bigint', () => {
+  it('buildSnapshot normalizes walletUSDTBalance to a USD float (6 decimals)', () => {
     const raw = { totalCollateralBase: 0n, totalDebtBase: 0n, availableBorrowsBase: 0n, healthFactor: 0n }
-    expect(buildSnapshot('base', raw, 250_000000n, 0n).walletUSDTBalance).toBe(250_000000n)
+    expect(buildSnapshot('base', raw, 250_000000n, 0n).walletUSDT).toBeCloseTo(250)
   })
 
   it('buildSnapshot converts supplyRayRate to supplyAPY percent', () => {

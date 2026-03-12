@@ -54,14 +54,14 @@ describe('chain-monitor module', () => {
     expect(result[0].healthFactor).toBe(Infinity)
   })
 
-  it('snapshot walletUSDTBalance comes from getTokenBalance', async () => {
+  it('snapshot walletUSDT comes from getTokenBalance normalized to USD', async () => {
     const factory = makeStubFactory({
       getAccount: vi.fn().mockReturnValue({
         getTokenBalance: vi.fn().mockResolvedValue(500_000000n)
       })
     })
     const result = await new ChainMonitor(factory).getSnapshots(['arbitrum'])
-    expect(result[0].walletUSDTBalance).toBe(500_000000n)
+    expect(result[0].walletUSDT).toBeCloseTo(500)
   })
 
   it('getSnapshots calls getLendingProtocol with each chain name', async () => {
