@@ -6,7 +6,11 @@ export const dynamic = 'force-dynamic'
 
 export async function GET () {
   try {
-    const kv = createClient({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN })
+    const url = process.env.KV_REST_API_URL
+    const token = process.env.KV_REST_API_TOKEN
+    console.log('[status] KV url:', url ? url.slice(0, 40) + '...' : 'MISSING')
+    console.log('[status] KV token prefix:', token ? token.slice(0, 8) + '...' : 'MISSING')
+    const kv = createClient({ url, token })
     const store = new DashboardStore(kv)
     const status = await store.getStatus()
     return NextResponse.json(status)
