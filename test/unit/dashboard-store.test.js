@@ -26,30 +26,39 @@ describe('DashboardStore', () => {
     expect(typeof store.getStatus).toBe('function')
   })
 
-  it('saveRun stores snapshots and decision in kv as plain object', async () => {
+  it('saveRun stores snapshots and decision in kv as JSON string', async () => {
     const kv = makeKv()
     const store = new DashboardStore(kv)
     await store.saveRun(makeRun())
-    expect(kv.set).toHaveBeenCalledWith('last_run', expect.any(Object))
+    expect(kv.set).toHaveBeenCalledWith('last_run', expect.any(String))
   })
 
   it('saveRun appends entry to audit list and trims to 20', async () => {
     const kv = makeKv()
     const store = new DashboardStore(kv)
     await store.saveRun(makeRun())
-    expect(kv.lpush).toHaveBeenCalledWith('audit_log', expect.any(Object))
+    expect(kv.lpush).toHaveBeenCalledWith('audit_log', expect.any(String))
     expect(kv.ltrim).toHaveBeenCalledWith('audit_log', 0, 19)
   })
 
-  it('getStatus returns last_run and audit_log entries as-is from kv', async () => {
+  it('getStatus parses string values returned by kv', async () => {
+    const run = { snapshots: [{ chain: 'arbitrum' }], decision: {}, execResult: {} }
+    const kv = makeKv()
+    kv.get.mockResolvedValue(JSON.stringify(run))
+    kv.lrange.mockResolvedValue([JSON.stringify({ action: 'supply' })])
+    const store = new DashboardStore(kv)
+    const status = await store.getStatus()
+    expect(status.lastRun.snapshots[0].chain).toBe('arbitrum')
+    expect(status.auditLog).toHaveLength(1)
+  })
+
+  it('getStatus handles pre-parsed objects returned by kv (upstash auto-deserialize)', async () => {
     const run = { snapshots: [{ chain: 'arbitrum' }], decision: {}, execResult: {} }
     const kv = makeKv()
     kv.get.mockResolvedValue(run)
     kv.lrange.mockResolvedValue([{ action: 'supply' }])
     const store = new DashboardStore(kv)
     const status = await store.getStatus()
-    expect(kv.get).toHaveBeenCalledWith('last_run')
-    expect(kv.lrange).toHaveBeenCalledWith('audit_log', 0, 19)
     expect(status.lastRun.snapshots[0].chain).toBe('arbitrum')
     expect(status.auditLog).toHaveLength(1)
   })
