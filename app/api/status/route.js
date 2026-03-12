@@ -13,8 +13,12 @@ export async function GET () {
     const kv = createClient({ url, token })
     const raw = await kv.get('last_run')
     console.log('[status] last_run type:', typeof raw, 'snippet:', JSON.stringify(raw)?.slice(0, 80))
-    const store = new DashboardStore(kv)
-    const status = await store.getStatus()
+    const entries = await kv.lrange('audit_log', 0, 19)
+    const parse = v => typeof v === 'string' ? JSON.parse(v) : v
+    const status = {
+      lastRun: raw != null ? parse(raw) : null,
+      auditLog: Array.isArray(entries) ? entries.map(parse) : []
+    }
     return NextResponse.json(status, { headers: { 'Cache-Control': 'no-store' } })
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 })
