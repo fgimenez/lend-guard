@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET () {
   try {
-    const kv = createClient({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN })
+    const kv = createClient({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN, cache: 'no-store' })
     const [raw, entries] = await Promise.all([
       kv.get('last_run'),
       kv.lrange('audit_log', 0, 19)

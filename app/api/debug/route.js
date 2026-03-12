@@ -7,14 +7,14 @@ export async function GET () {
   const url = process.env.KV_REST_API_URL
   const token = process.env.KV_REST_API_TOKEN
   try {
-    const kv = createClient({ url, token })
+    const kv = createClient({ url, token, cache: 'no-store' })
     await kv.set('debug_test', 'hello')
     const val = await kv.get('debug_test')
     const lastRun = await kv.get('last_run')
     const lastRunStr = lastRun ? JSON.stringify(lastRun).slice(0, 120) : null
     return NextResponse.json({
       urlPrefix: url ? url.slice(0, 30) + '...' : null,
-      hasToken: !!token,
+      tokenPrefix: token ? token.slice(0, 8) + '...' : null,
       writeReadTest: val,
       lastRunSnippet: lastRunStr
     })
