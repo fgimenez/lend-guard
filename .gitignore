@@ -1,0 +1,7 @@
+node_modules/
+.env
+CLAUDE.md
+config.json
+audit.jsonl
+coverage/
+*.local.json
