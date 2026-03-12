@@ -1,16 +1,19 @@
 export class AgentLoop {
-  constructor ({ monitor, decisionEngine, executor, strategy } = {}) {
+  constructor ({ monitor, decisionEngine, executor, strategy, store } = {}) {
     this._monitor = monitor
     this._decisionEngine = decisionEngine
     this._executor = executor
     this._strategy = strategy
+    this._store = store
   }
 
   async runOnce () {
     const snapshots = await this._monitor.getSnapshots(this._strategy.chains)
     const decision = await this._decisionEngine.decide(snapshots)
     const execResult = await this._executor.execute(decision)
-    return { snapshots, decision, execResult }
+    const result = { snapshots, decision, execResult }
+    if (this._store) await this._store.saveRun(result)
+    return result
   }
 
   start () {

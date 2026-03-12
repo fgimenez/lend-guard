@@ -72,6 +72,17 @@ describe('loop module', () => {
     vi.useRealTimers()
   })
 
+  it('runOnce calls store.saveRun with result when store is provided', async () => {
+    const store = { saveRun: vi.fn().mockResolvedValue(undefined) }
+    const deps = makeStubDeps({ store })
+    const result = await new AgentLoop(deps).runOnce()
+    expect(store.saveRun).toHaveBeenCalledWith(result)
+  })
+
+  it('runOnce does not throw when no store is provided', async () => {
+    await expect(new AgentLoop(makeStubDeps()).runOnce()).resolves.toBeDefined()
+  })
+
   it('runOnce resolves to an object with snapshots, decision, and execResult', async () => {
     const snapshots = [{ chain: 'base', healthFactor: 2.1 }]
     const decision = makeStubDecision()

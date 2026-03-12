@@ -11,12 +11,13 @@ import { DecisionEngine } from './agent/decision.js'
 import { ActionExecutor } from './agent/executor.js'
 import { AgentLoop } from './agent/loop.js'
 import { AuditLogger } from './audit/logger.js'
+import { DashboardStore } from './dashboard/store.js'
 
 export function createAgent (deps) {
   return new AgentLoop(deps)
 }
 
-export function bootstrap (env = process.env) {
+export async function bootstrap (env = process.env) {
   const seed = env.WDK_SEED
   if (!seed) throw new Error('WDK_SEED env var is required')
 
@@ -39,12 +40,21 @@ export function bootstrap (env = process.env) {
   const executor = new ActionExecutor(factory)
   const logger = new AuditLogger(env.AUDIT_LOG || 'audit.jsonl', appendFile)
 
-  const loop = new AgentLoop({ monitor, decisionEngine, executor, strategy, logger })
+  let store
+  if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
+    const { createClient } = await import('@vercel/kv')
+    const kv = createClient({ url: env.KV_REST_API_URL, token: env.KV_REST_API_TOKEN })
+    store = new DashboardStore(kv)
+  }
+
+  const loop = new AgentLoop({ monitor, decisionEngine, executor, strategy, logger, store })
   return loop
 }
 
 if (process.argv[1] === new URL(import.meta.url).pathname) {
-  const loop = bootstrap()
-  console.log('Starting Autonomous Lending Position Manager...')
-  loop.start()
+  (async () => {
+    const loop = await bootstrap()
+    console.log('Starting LendGuard — Autonomous Lending Position Manager...')
+    loop.start()
+  })()
 }
