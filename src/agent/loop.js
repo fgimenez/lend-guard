@@ -16,7 +16,13 @@ export class AgentLoop {
     const execResult = await this._executor.execute(decision)
     console.log('[loop] execResult', JSON.stringify(execResult, (_, v) => typeof v === 'bigint' ? v.toString() : v))
     const result = { snapshots, decision, execResult }
-    if (this._store) await this._store.saveRun(result)
+    if (this._store) {
+      console.log('[loop] saveRun start')
+      await this._store.saveRun(result)
+      console.log('[loop] saveRun done')
+    } else {
+      console.log('[loop] no store configured, skipping saveRun')
+    }
     return result
   }
 
