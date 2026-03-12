@@ -13,7 +13,7 @@ export async function GET () {
     const kv = createClient({ url, token })
     const store = new DashboardStore(kv)
     const status = await store.getStatus()
-    return NextResponse.json(status)
+    return NextResponse.json(status, { headers: { 'Cache-Control': 'no-store' } })
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
