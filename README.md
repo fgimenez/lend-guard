@@ -4,11 +4,13 @@
 
 Built for [Hackathon Galáctica: WDK Edition 1](https://dorahacks.io/hackathon/wdk-edition-1) · **Lending Bot** track
 
+**Live dashboard:** https://lend-guard.vercel.app
+
 ---
 
 ## What it does
 
-LendGuard runs a continuous loop — every 30 minutes via Vercel Cron — across all configured chains:
+LendGuard runs a continuous loop — every 30 minutes via Railway — across all configured chains:
 
 1. **Liquidation Guardian** — reads the health factor of every active borrow position. When it falls below your defined threshold (default: 1.5), the agent auto-repays debt or adds collateral to bring it back to the target (default: 2.0). No margin calls. No liquidation penalties.
 
@@ -25,14 +27,14 @@ The rules are yours. The execution is the agent's.
 ## How it works
 
 ```
-Every 30 min (Vercel Cron → POST /api/run):
+Every 30 min (Railway agent loop):
   1. ChainMonitor   → snapshot health factor + supply APY on each chain (parallel)
   2. DecisionEngine → Claude Haiku analyzes snapshots against strategy rules
                       → returns { action, chain, amountUSDT, reasoning }
   3. ActionExecutor → executes supply / repay / withdraw on Aave V3 via WDK
   4. DashboardStore → saves result to Vercel KV (last_run + audit_log list)
 
-GET /api/status     → reads KV, serves dashboard data
+GET /api/status     → reads KV, serves dashboard data (Vercel)
 GET /              → Next.js dashboard UI (polls /api/status every 30s)
 ```
 
@@ -69,7 +71,6 @@ app/
     run/route.js     POST — runs one agent cycle, saves to Vercel KV
     status/route.js  GET — reads from Vercel KV
 
-vercel.json          Cron: POST /api/run every 30 minutes
 next.config.mjs      Next.js config (ESM externals for WDK packages)
 ```
 
@@ -87,50 +88,47 @@ All components use **dependency injection** — no class instantiates WDK or Ant
 | AI decision | Claude Haiku 4.5 via Anthropic SDK |
 | Protocol | Aave V3 — supply, repay, withdraw, health factor |
 | Chains | Ethereum, Arbitrum, Base, Optimism |
-| Scheduling | Vercel Cron (every 30 min) |
-| State | Vercel KV (last run + audit log) |
-| Tests | Vitest — unit (136), integration (4), e2e (6, Base Sepolia testnet) |
+| Scheduling | Railway (30 min polling loop) |
+| State | Vercel KV / Upstash Redis (last run + audit log) |
+| Tests | Vitest — unit (141), integration (4), e2e (6, Base Sepolia testnet) |
 | CI | GitHub Actions — all three test layers on every push |
-| Deployment | Vercel |
+| Deployment | Railway (agent) + Vercel (dashboard) |
 
 ---
 
-## Deploy to Vercel
+## Deploy
 
-### 1. Create a Vercel KV database
+### Architecture
 
-In your Vercel project dashboard → Storage → Create KV Database → connect to project.
+The agent uses native Node.js addons (via WDK) that can't run in serverless functions. The setup is:
 
-### 2. Set environment variables
+- **Railway** — runs the agent loop (`node src/index.js`), writes results to Vercel KV
+- **Vercel** — hosts the Next.js dashboard, reads from Vercel KV
 
-In Vercel project settings → Environment Variables:
+### 1. Vercel (dashboard)
+
+Deploy the repo to Vercel. In your project dashboard → Storage → Create KV Database → connect to project. This auto-injects `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
+
+### 2. Railway (agent)
+
+Create a Railway service from the same repo. Set these environment variables:
 
 ```env
 WDK_SEED="your twelve word bip39 seed phrase here"
 ANTHROPIC_API_KEY=sk-ant-...
 
+# Copy from Vercel → Settings → Environment Variables
+KV_REST_API_URL=https://...
+KV_REST_API_TOKEN=...
+
 # Optional — strategy
-CHAINS=ethereum,arbitrum,base,optimism
+CHAINS=baseSepolia          # or ethereum,arbitrum,base,optimism for mainnet
 MIN_HEALTH_FACTOR=1.5
 TARGET_HEALTH_FACTOR=2.0
 INTERVAL_MINUTES=30
-
-# Optional — custom RPC endpoints
-RPC_ETHEREUM=
-RPC_ARBITRUM=
-RPC_BASE=
-RPC_OPTIMISM=
 ```
 
-The `KV_REST_API_URL` and `KV_REST_API_TOKEN` vars are added automatically when you connect the KV database.
-
-### 3. Deploy
-
-```bash
-npx vercel --prod
-```
-
-The dashboard will be live at your Vercel URL. The cron job runs automatically every 30 minutes.
+Set the start command to `npm start`. Railway will keep the agent running continuously.
 
 ---
 
