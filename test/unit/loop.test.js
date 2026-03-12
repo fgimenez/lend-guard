@@ -49,6 +49,21 @@ describe('loop module', () => {
     expect(typeof new AgentLoop(makeStubDeps()).start).toBe('function')
   })
 
+  it('start logs errors from runOnce without crashing', async () => {
+    vi.useFakeTimers()
+    const err = new Error('rpc timeout')
+    const deps = makeStubDeps({ monitor: { getSnapshots: vi.fn().mockRejectedValue(err) } })
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const loop = new AgentLoop(deps)
+    loop.start()
+    await Promise.resolve()
+    await Promise.resolve()
+    loop.stop()
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('runOnce'), err)
+    consoleSpy.mockRestore()
+    vi.useRealTimers()
+  })
+
   it('start calls runOnce immediately', async () => {
     vi.useFakeTimers()
     const deps = makeStubDeps()

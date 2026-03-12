@@ -17,8 +17,9 @@ export class AgentLoop {
   }
 
   start () {
-    this.runOnce()
-    this._timer = setInterval(() => this.runOnce(), this._strategy.intervalMinutes * 60 * 1000)
+    const run = () => this.runOnce().catch(err => console.error('runOnce error:', err))
+    run()
+    this._timer = setInterval(run, this._strategy.intervalMinutes * 60 * 1000)
   }
 
   stop () {
