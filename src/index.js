@@ -42,9 +42,13 @@ export async function bootstrap (env = process.env) {
 
   let store
   if (env.KV_REST_API_URL && env.KV_REST_API_TOKEN) {
+    console.log('[bootstrap] KV url:', env.KV_REST_API_URL.slice(0, 40) + '...')
     const { createClient } = await import('@vercel/kv')
     const kv = createClient({ url: env.KV_REST_API_URL, token: env.KV_REST_API_TOKEN })
     store = new DashboardStore(kv)
+    console.log('[bootstrap] KV store created')
+  } else {
+    console.log('[bootstrap] KV not configured')
   }
 
   const loop = new AgentLoop({ monitor, decisionEngine, executor, strategy, logger, store })
