@@ -123,9 +123,9 @@ describe('e2e: full agent loop (real APIs, stubbed Aave)', () => {
           availableBorrowsBase: 0n,
           currentLiquidationThreshold: 0n,
           ltv: 0n,
-          healthFactor: MAX_UINT256,
-          currentLiquidityRate: 0n
-        })
+          healthFactor: MAX_UINT256
+        }),
+        getSupplyRate: vi.fn().mockResolvedValue(0n)
       }),
       getAccount: vi.fn().mockReturnValue(
         new WalletAccountEvm(SEED, "0'/0/0", { provider: RPC_BASE_SEPOLIA })
