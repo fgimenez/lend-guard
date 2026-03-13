@@ -71,6 +71,11 @@ describe('e2e: Aave supply and withdraw on Base Sepolia', () => {
     const executor = new ActionExecutor(factory)
     const aave = factory.getLendingProtocol('baseSepolia')
 
+    // Skip if wallet has insufficient USDT (agent may have deployed it)
+    const account2 = factory.getAccount('baseSepolia')
+    const walletBalance = await account2.getTokenBalance(CHAIN_CONFIG.baseSepolia.usdtAddress)
+    if (walletBalance < 10_000000n) return
+
     // Check initial collateral
     const before = await aave.getAccountData()
 
