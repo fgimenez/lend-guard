@@ -102,7 +102,10 @@ export default function Dashboard () {
       {/* Last decision */}
       {decision && (
         <section style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: 14, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Last Decision</h2>
+          <h2 style={{ fontSize: 14, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>
+            Last Decision
+            {run?.snapshots?.[0]?.timestamp && <span style={{ marginLeft: 8, fontWeight: 400, fontSize: 12, textTransform: 'none', letterSpacing: 0, color: '#475569' }}>· {fmtTime(run.snapshots[0].timestamp)}</span>}
+          </h2>
           <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: 12, padding: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
               <span style={{
