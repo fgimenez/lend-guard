@@ -10,6 +10,15 @@ const HEALTH_COLOR = (hf) => {
 
 const ACTION_COLOR = { supply: '#00e5cc', repay: '#f97316', withdraw: '#a78bfa', hold: '#64748b' }
 
+const EXPLORER_TX = {
+  ethereum: 'https://etherscan.io/tx/',
+  arbitrum: 'https://arbiscan.io/tx/',
+  base: 'https://basescan.org/tx/',
+  optimism: 'https://optimistic.etherscan.io/tx/',
+  sepolia: 'https://sepolia.etherscan.io/tx/',
+  baseSepolia: 'https://sepolia.basescan.org/tx/'
+}
+
 const fmt = (v) => v === 'Infinity' ? '∞' : typeof v === 'number' ? v.toFixed(2) : v ?? '—'
 const fmtAPY = (v) => v ? v.toFixed(2) + '%' : '—'
 const fmtUSDT = (v) => v != null ? '$' + Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '—'
@@ -132,10 +141,16 @@ export default function Dashboard () {
                 }}>{entry.decision?.action ?? '—'}</span>
                 <span style={{ color: '#94a3b8', flex: 1 }} title={entry.decision?.reasoning}>
                   {entry.decision?.chain ?? '—'}
-                  {entry.execResult?.txHash &&
-                    <span style={{ marginLeft: 8, color: '#475569', fontFamily: 'monospace', fontSize: 11 }}>
-                      {entry.execResult.txHash.slice(0, 10)}…
-                    </span>}
+                  {entry.execResult?.txHash && (() => {
+                    const url = EXPLORER_TX[entry.decision?.chain]
+                    const short = entry.execResult.txHash.slice(0, 10) + '…'
+                    return url
+                      ? <a href={url + entry.execResult.txHash} target="_blank" rel="noopener noreferrer"
+                          style={{ marginLeft: 8, color: '#475569', fontFamily: 'monospace', fontSize: 11, textDecoration: 'underline' }}>
+                          {short}
+                        </a>
+                      : <span style={{ marginLeft: 8, color: '#475569', fontFamily: 'monospace', fontSize: 11 }}>{short}</span>
+                  })()}
                 </span>
                 {entry.execResult?.error &&
                   <span style={{ color: '#ef4444', fontSize: 11 }}>{entry.execResult.error.slice(0, 40)}</span>}
