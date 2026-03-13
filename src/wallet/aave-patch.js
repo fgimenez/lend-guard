@@ -21,6 +21,11 @@ export class PatchedAaveProtocolEvm extends AaveProtocolEvm {
     return pool
   }
 
+  async getSupplyRate (token) {
+    const reserve = await this._getTokenReserve(token)
+    return reserve.liquidityRate ?? 0n
+  }
+
   async _getAddressMap () {
     if (!this._addressMap) {
       const { chainId } = await this._provider.getNetwork()

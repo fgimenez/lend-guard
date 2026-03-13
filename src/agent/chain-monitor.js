@@ -13,10 +13,11 @@ export class ChainMonitor {
     const aave = this._factory.getLendingProtocol(chain)
     const account = this._factory.getAccount(chain)
     const token = this._factory.getTokenAddress(chain)
-    const [accountData, walletBalance] = await Promise.all([
+    const [accountData, walletBalance, supplyRate] = await Promise.all([
       aave.getAccountData(),
-      account.getTokenBalance(token)
+      account.getTokenBalance(token),
+      aave.getSupplyRate(token).catch(() => 0n)
     ])
-    return buildSnapshot(chain, accountData, walletBalance, accountData.currentLiquidityRate ?? 0n)
+    return buildSnapshot(chain, accountData, walletBalance, supplyRate)
   }
 }

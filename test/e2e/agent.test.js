@@ -95,11 +95,11 @@ describe('e2e: Aave supply and withdraw on Base Sepolia', () => {
     const after = await aave.getAccountData()
     expect(after.totalCollateralBase).toBeGreaterThan(before.totalCollateralBase)
 
-    // Withdraw it back (use max uint256 to withdraw all)
+    // Withdraw only what this test supplied (not MaxUint256 — would wipe any agent position)
     const withdrawResult = await executor.execute({
       action: 'withdraw',
       chain: 'baseSepolia',
-      amountRaw: 2n ** 256n - 1n,
+      amountRaw: 10_000000n,
       reasoning: 'e2e test cleanup',
       confidence: 1,
       urgency: 'low'

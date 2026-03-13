@@ -79,6 +79,15 @@ describe('factory module', () => {
     expect(result).toBe(receipt)
   })
 
+  it('waitForTransaction throws when receipt status is 0 (reverted)', async () => {
+    const receipt = { status: 0 }
+    const account = { getTransactionReceipt: vi.fn().mockResolvedValue(receipt) }
+    const StubWalletAccount = vi.fn().mockReturnValue(account)
+    const chainConfig = { arbitrum: { usdtAddress: '0xABC', rpcUrl: 'https://arb.io', chainId: 42161 } }
+    const factory = new WalletFactory('seed', chainConfig, { WalletAccount: StubWalletAccount, AaveProtocol: vi.fn(), confirmationDelay: 0 })
+    await expect(factory.waitForTransaction('arbitrum', '0xhash')).rejects.toThrow('Transaction reverted')
+  })
+
   it('getLendingProtocol passes seed and rpcUrl to WalletAccount', () => {
     const StubWalletAccount = vi.fn()
     const StubAaveProtocol = vi.fn()

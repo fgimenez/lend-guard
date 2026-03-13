@@ -6,7 +6,8 @@ const makeStubFactory = (overrides = {}) => ({
     getAccountData: vi.fn().mockResolvedValue({
       totalCollateralBase: 0n, totalDebtBase: 0n, availableBorrowsBase: 0n,
       currentLiquidationThreshold: 0n, ltv: 0n, healthFactor: 2n ** 256n - 1n
-    })
+    }),
+    getSupplyRate: vi.fn().mockResolvedValue(0n)
   }),
   getAccount: vi.fn().mockReturnValue({
     getTokenBalance: vi.fn().mockResolvedValue(0n)
@@ -49,9 +50,9 @@ describe('chain-monitor module', () => {
     expect(result[0].chain).toBe('arbitrum')
   })
 
-  it('snapshot healthFactor is Infinity when no debt', async () => {
+  it('snapshot healthFactor is "Infinity" string when no debt', async () => {
     const result = await new ChainMonitor(makeStubFactory()).getSnapshots(['arbitrum'])
-    expect(result[0].healthFactor).toBe(Infinity)
+    expect(result[0].healthFactor).toBe('Infinity')
   })
 
   it('snapshot walletUSDT comes from getTokenBalance normalized to USD', async () => {

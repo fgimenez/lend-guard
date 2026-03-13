@@ -31,6 +31,7 @@ export class WalletFactory {
       if (receipt) {
         // Brief pause to allow RPC nodes to propagate the confirmed state
         await new Promise(resolve => setTimeout(resolve, this._confirmationDelay))
+        if (receipt.status === 0) throw new Error(`Transaction reverted: ${hash}`)
         return receipt
       }
       await new Promise(resolve => setTimeout(resolve, 1000))

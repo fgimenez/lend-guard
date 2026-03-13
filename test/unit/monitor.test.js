@@ -16,8 +16,8 @@ describe('monitor module', () => {
     expect(normalizeHealthFactor(15n * 10n ** 17n)).toBe(1.5)
   })
 
-  it('normalizeHealthFactor returns Infinity for MaxUint256 (no debt)', () => {
-    expect(normalizeHealthFactor(2n ** 256n - 1n)).toBe(Infinity)
+  it('normalizeHealthFactor returns "Infinity" string for MaxUint256 (no debt)', () => {
+    expect(normalizeHealthFactor(2n ** 256n - 1n)).toBe('Infinity')
   })
 
   it('normalizeHealthFactor returns 0 for zero input', () => {

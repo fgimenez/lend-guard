@@ -2,7 +2,7 @@ const WAD = 10n ** 18n
 const MAX_UINT256 = 2n ** 256n - 1n
 
 export function normalizeHealthFactor (raw) {
-  if (raw === MAX_UINT256) return Infinity
+  if (raw === MAX_UINT256) return 'Infinity'
   return Number(raw * 10000n / WAD) / 10000
 }
 
