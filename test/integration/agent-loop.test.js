@@ -14,9 +14,9 @@ const makeStubWalletFactory = (healthFactor = MAX_UINT256, walletBalance = 1000_
       availableBorrowsBase: 0n,
       currentLiquidationThreshold: 8000n,
       ltv: 7500n,
-      healthFactor,
-      currentLiquidityRate: 0n
+      healthFactor
     }),
+    getSupplyRate: vi.fn().mockResolvedValue(0n),
     getPoolAddress: vi.fn().mockResolvedValue('0xPool'),
     supply: vi.fn().mockResolvedValue({ hash: '0xabc123' }),
     repay: vi.fn().mockResolvedValue({ hash: '0xdef456' }),
@@ -81,7 +81,7 @@ describe('agent loop integration', () => {
     const loop = new AgentLoop({ monitor, decisionEngine, executor, strategy })
     const result = await loop.runOnce()
 
-    expect(result.snapshots[0].healthFactor).toBe(Infinity)
+    expect(result.snapshots[0].healthFactor).toBe('Infinity')
   })
 
   it('snapshot healthFactor is a finite number when debt exists', async () => {
