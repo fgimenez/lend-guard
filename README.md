@@ -2,7 +2,7 @@
 
 **Autonomous USDT Lending Position Manager** — a fully autonomous AI agent that protects your Aave V3 positions from liquidation and maximizes yield across multiple EVM chains, with zero human intervention required.
 
-Built for [Hackathon Galáctica: WDK Edition 1](https://dorahacks.io/hackathon/wdk-edition-1) · **Lending Bot** track
+Built for [Hackathon Galáctica: WDK Edition 1](https://dorahacks.io/hackathon/hackathon-galactica-wdk-2026-01/buidl) · **Lending Bot** track
 
 **Live dashboard:** https://lend-guard.vercel.app
 
